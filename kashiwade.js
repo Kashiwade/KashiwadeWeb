@@ -12,9 +12,11 @@ navigator.getMedia = navigator.getUserMedia ||
 
 //端末のビデオ、音声ストリームを取得
 var mic;
-navigator.getMedia ({ audio:true }, function(stream) {
-        mic = audioctx.createMediaStreamSource(stream);
-}, function(err){ console.log("err") });
+if (navigator.getMedia) {
+    navigator.getMedia ({ audio:true }, function(stream) {
+            mic = audioctx.createMediaStreamSource(stream);
+    }, function(err){ console.log("err") });
+}
 
 var audioctx = new AudioContext();
  
@@ -77,8 +79,10 @@ function Play() {
     if(player == null) {
         convolver.buffer = buffers[0];
         revlevel.connect(audioctx.destination);
-        mic.connect(convolver);
-        mic.connect(audioctx.destination);
+        if (mic) {
+            mic.connect(convolver);
+            mic.connect(audioctx.destination);
+        }
         if (buffers[1]==null) return;
         player = audioctx.createBufferSource();
         player.buffer = buffers[1];
@@ -91,7 +95,7 @@ function Play() {
 }
 function Stop() {
     revlevel.disconnect();
-    mic.disconnect();
+    if (mic) mic.disconnect();
     if (player==null) return;
     player.stop(0);
     player = null;
