@@ -12,7 +12,6 @@ navigator.getMedia = navigator.getUserMedia ||
 
 //端末のビデオ、音声ストリームを取得
 var mic;
-console.log(navigator.getMedia);
 if (navigator.getMedia) {
     navigator.getMedia ({ audio:true }, function(stream) {
             mic = audioctx.createMediaStreamSource(stream);
