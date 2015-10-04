@@ -12,13 +12,20 @@ navigator.getMedia = navigator.getUserMedia ||
 
 //端末のビデオ、音声ストリームを取得
 var mic;
+console.log(navigator.getMedia);
 if (navigator.getMedia) {
     navigator.getMedia ({ audio:true }, function(stream) {
             mic = audioctx.createMediaStreamSource(stream);
     }, function(err){ console.log("err") });
 }
 
-var audioctx = new AudioContext();
+var AudioContext = window.AudioContext || window.webkitAudioContext || false;
+var audioctx;
+if (AudioContext) {
+    var audioctx = new AudioContext;
+} else {
+    alert("Sorry, but the Web Audio API is not supported by your browser. Please, consider upgrading to the latest version or downloading Google Chrome or Mozilla Firefox");
+}
  
 var player = null;
 var convolver = audioctx.createConvolver();
