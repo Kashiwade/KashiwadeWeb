@@ -64,6 +64,9 @@ function doMarkerClick(marker)
 		position: marker.position
 	});
 	infowindow.open(map);
+	google.maps.event.addListener(infowindow,'closeclick', function() {
+		Stop();
+	});
 };
 google.maps.event.addListener(marker1, "click", function() {
     doMarkerClick(marker1);
