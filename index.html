@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Kashiwade Map</title>
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key={AIzaSyAZ7xIjw2S2QRrm1DyPNNQrt7tcXSfVBVI}"></script> -->
+<script src="kashiwade.js"></script>
+ </head>
+<body>
+<div class="map-embed">
+	<div id="maparea"></div>
+</div>
+<script type="text/javascript">
+var canvas = document.getElementById( 'maparea' ) ;
+
+var mapOptions = {
+	zoom: 10 ,				// ズーム値
+	center: new google.maps.LatLng( 35.405826 , 139.5120954 ) ,		// 中心座標 [latlng]
+	disableDefaultUI: true,
+	mapTypeId: google.maps.MapTypeId.ROADMAP
+};
+
+var map = new google.maps.Map( canvas , mapOptions ) ;
+
+var marker1 = new google.maps.Marker({
+  position: new google.maps.LatLng(35.1598865,139.1359808),
+  map: map,
+  title: "真鶴1",
+});
+var marker2 = new google.maps.Marker({
+  position: new google.maps.LatLng(35.7015253,139.7092071),
+  map: map,
+  title: "新宿",
+});
+var marker3 = new google.maps.Marker({
+  position: new google.maps.LatLng(35.6295764,139.794686),
+  map: map,
+  title: "ビックサイト",
+});
+var marker4= new google.maps.Marker({
+  position: new google.maps.LatLng(35.5571491,139.6949123),
+  map: map,
+  title: "ポケモンセンター",
+});
+var infowindow;
+function doMarkerClick(marker)
+{
+	console.log(marker);
+	loadContents(marker.title);
+	if (infowindow) infowindow.close();
+	var htmltext="";
+	htmltext+=marker.title+"<br/>";
+	htmltext+='<img src="'+getImageURL(marker.title)+'"width="150" height="60"><br/>';
+	htmltext+='<button onclick="Play()">Play</button><br/>';
+	htmltext+='ReverbLevel : <input type="range" id="revlevel" min="0" max="100" value="50" onchange="setRevLevel()"/><br/>';
+	htmltext+='SELevel :     <input type="range" id="selevel" min="0" max="100" value="50" onchange="setSELevel()"/><br/>';
+  	infowindow = new google.maps.InfoWindow({
+ 		content: htmltext,
+		position: marker.position
+	});
+	infowindow.open(map);
+};
+google.maps.event.addListener(marker1, "click", function() {
+    doMarkerClick(marker1);
+});
+google.maps.event.addListener(marker2, "click", function() {
+    doMarkerClick(marker2);
+});
+google.maps.event.addListener(marker3, "click", function() {
+    doMarkerClick(marker3);
+});
+google.maps.event.addListener(marker4, "click", function() {
+    doMarkerClick(marker4);
+});
+</script>
+<style type="text/css">
+.map-embed
+{
+	max-width: 100% ;
+	height: 0 ;
+	margin: 0 ;
+	padding: 0 0 56.25% ;
+
+	overflow: hidden ;
+
+	position: relative ;
+	top: 0 ;
+	left: 0 ;
+}
+
+.map-embed > div
+{
+	position: absolute ;
+	top: 0 ;
+	left: 0 ;
+
+	width: 100% ;
+	height: 100% ;
+
+	margin: 0 ;
+	padding: 0 ;
+}
+
+.map-embed img
+{
+	max-width: none ;
+}
+</style>
+</body>
+</html>
