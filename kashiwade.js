@@ -35,14 +35,31 @@ revlevel.gain.value=0.5;
 selevel.gain.value=0.5;
 convolver.connect(revlevel);
 selevel.connect(audioctx.destination);
+revlevel.connect(audioctx.destination);
 var loadfiles = [
     "",
     "",
     "",
 ];
 var buffers = [];
+var clapwave;
 var loadidx = 0;
 
+function LoadClapWave() {
+    var req = new XMLHttpRequest();
+    req.open("GET", "audiofiles/kashiwade.wav", true);
+    req.responseType = "arraybuffer";
+    req.onload = function() {
+        if(req.response) {
+            audioctx.decodeAudioData(req.response,function(b){
+                clapwave=b;
+           },function(){});
+        }
+        else
+            clapwave = audioctx.createBuffer(VBArray(req.responseBody).toArray(), false);
+    };
+    req.send();
+}
 function LoadBuffers() {
     var req = new XMLHttpRequest();
     req.open("GET", loadfiles[loadidx], true);
@@ -64,12 +81,10 @@ function LoadBuffers() {
 function loadContents(key) {
     Stop();
     loadidx = 0;
-    console.log(files[key]);
     buffers[0]=null;
     buffers[1]=null;
     loadfiles[0]=files[key]["ir"];
     loadfiles[1]=files[key]["se"];
-    loadfiles[2]="audiofiles/kashiwade.wav";
     LoadBuffers();
 }
 function getImageURL(key) {
@@ -84,18 +99,18 @@ function setSELevel() {
     selevel.gain.value=parseInt(level)*0.01;
 }
 function clap() {
-    if(player == null) return;
-    if (buffers[2]==null) return;
-    clap = audioctx.createBufferSource();
-    clap.buffer = buffers[2];
-    clap.loop = falsw;
-    clap.connect(audioctx.destination);
-    clap.start(0);
+    convolver.buffer = buffers[0];
+    var source = audioctx.createBufferSource();
+    source.buffer = clapwave;
+    source.loop = false;
+    source.connect(audioctx.destination);
+    source.connect(convolver);
+    source.start(0);
 }
 function Play() {
     if(player == null) {
         convolver.buffer = buffers[0];
-        revlevel.connect(audioctx.destination);
+        //revlevel.connect(audioctx.destination);
         if (mic) {
             mic.connect(convolver);
             mic.connect(audioctx.destination);
@@ -111,7 +126,7 @@ function Play() {
     }
 }
 function Stop() {
-    revlevel.disconnect();
+    //revlevel.disconnect();
     if (mic) mic.disconnect();
     if (player==null) return;
     player.stop(0);
