@@ -38,6 +38,7 @@ selevel.connect(audioctx.destination);
 var loadfiles = [
     "",
     "",
+    "",
 ];
 var buffers = [];
 var loadidx = 0;
@@ -68,6 +69,7 @@ function loadContents(key) {
     buffers[1]=null;
     loadfiles[0]=files[key]["ir"];
     loadfiles[1]=files[key]["se"];
+    loadfiles[2]="audiofiles/kashiwade.wav";
     LoadBuffers();
 }
 function getImageURL(key) {
@@ -80,6 +82,15 @@ function setRevLevel() {
 function setSELevel() {
     var level=document.getElementById("selevel").value;
     selevel.gain.value=parseInt(level)*0.01;
+}
+function clap() {
+    if(player == null) return;
+    if (buffers[2]==null) return;
+    clap = audioctx.createBufferSource();
+    clap.buffer = buffers[2];
+    clap.loop = falsw;
+    clap.connect(audioctx.destination);
+    clap.start(0);
 }
 function Play() {
     if(player == null) {

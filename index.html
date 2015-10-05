@@ -12,7 +12,7 @@
 	<div id="maparea"></div>
 </div>
 <script type="text/javascript">
-var canvas = document.getElementById( 'maparea' ) ;
+var canvas = document.getElementById('maparea') ;
 
 var mapOptions = {
 	zoom: 10 ,				// ズーム値
@@ -44,6 +44,23 @@ var marker4= new google.maps.Marker({
   title: "ポケモンセンター",
 });
 var infowindow;
+var clapcount=0;
+function onclapdown()
+{
+	var btnclap=document.getElementById('clapbtn');
+	btnclap.addEventListener("mouseleave",onclapup,false);
+	btnclap.style.backgroundImage='url(images/clap_2_c.png)';
+	clapcount++;
+	var claptext=document.getElementById('claptext');
+	claptext.textContent=clapcount+'柏手';
+	clap();
+}
+function onclapup()
+{
+	var btnclap=document.getElementById('clapbtn');
+	btnclap.removeEventListener("mouseleave",onclapup,false);
+	btnclap.style.backgroundImage='url(images/clap_1_c.png)';
+}
 function doMarkerClick(marker)
 {
 	console.log(marker);
@@ -55,6 +72,11 @@ function doMarkerClick(marker)
 	htmltext+='<button onclick="Play()">Play</button><br/>';
 	htmltext+='ReverbLevel : <input type="range" id="revlevel" min="0" max="100" value="50" onchange="setRevLevel()"/><br/>';
 	htmltext+='SELevel :     <input type="range" id="selevel" min="0" max="100" value="50" onchange="setSELevel()"/><br/>';
+	htmltext+='<div id="clapbtn"'
+	htmltext+=' style="width:50px; height:50px; background-size:auto 100%; background-image:url(images/clap_1_c.png);"';
+	htmltext+=' onmousedown="onclapdown()" onmouseup="onclapup()"';
+	htmltext+='></div>';
+	htmltext+='<div id="claptext">'+clapcount+'柏手</div>';
   	infowindow = new google.maps.InfoWindow({
  		content: htmltext,
 		position: marker.position
