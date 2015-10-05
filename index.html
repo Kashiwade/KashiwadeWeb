@@ -5,6 +5,7 @@
 <title>Kashiwade Map</title>
 <meta name="viewport" content="width=device-width,user-scalable=0">
 <script src="https://maps.googleapis.com/maps/api/js?sensor=set_to_true_or_false"></script>
+<script type="text/javascript" src="ncmb.min.js" charset="utf-8"></script>
 <script src="kashiwade.js"></script>
  </head>
 <body>
@@ -13,6 +14,8 @@
 </div>
 <script type="text/javascript">
 LoadClapWave();
+var ncmb = new NCMB("1be9dba7dec777026b5832322db9e5882f8e1cd5ed76fb7e45848657aa6c7ad3","af6b5030e091b942a843f099084821cd911e866622065d8f8c3a57c200f3dc3a");
+var kashiwadeData = ncmb.DataStore("kashiwade");
 var canvas = document.getElementById('maparea') ;
 
 var mapOptions = {
@@ -45,15 +48,15 @@ var marker4= new google.maps.Marker({
   title: "ポケモンセンター",
 });
 var infowindow;
-var clapcount=0;
+var clapcounts={"ビックサイト":0,"新宿":0,"真鶴1":0,"ポケモンセンター":0,"真鶴2":0 };
 function onclapdown()
 {
 	var btnclap=document.getElementById('clapbtn');
 	btnclap.addEventListener("mouseleave",onclapup,false);
 	btnclap.style.backgroundImage='url(images/clap_2_c.png)';
-	clapcount++;
+	clapcounts[infowindow.markertitle]++;
 	var claptext=document.getElementById('claptext');
-	claptext.textContent=clapcount+'柏手';
+	claptext.textContent=clapcounts[infowindow.markertitle]+'柏手';
 	clap();
 }
 function onclapup()
@@ -77,12 +80,13 @@ function doMarkerClick(marker)
 	htmltext+=' style="width:50px; height:50px; background-size:auto 100%; background-image:url(images/clap_1_c.png);"';
 	htmltext+=' onmousedown="onclapdown()" onmouseup="onclapup()"';
 	htmltext+='></div>';
-	htmltext+='<div id="claptext">'+clapcount+'柏手</div>';
+	htmltext+='<div id="claptext">'+clapcounts[marker.title]+'柏手</div>';
   	infowindow = new google.maps.InfoWindow({
  		content: htmltext,
 		position: marker.position
 	});
 	infowindow.open(map);
+	infowindow.markertitle=marker.title;
 	google.maps.event.addListener(infowindow,'closeclick', function() {
 		Stop();
 	});
