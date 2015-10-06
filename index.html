@@ -14,8 +14,6 @@
 </div>
 <script type="text/javascript">
 LoadClapWave();
-var ncmb = new NCMB("1be9dba7dec777026b5832322db9e5882f8e1cd5ed76fb7e45848657aa6c7ad3","af6b5030e091b942a843f099084821cd911e866622065d8f8c3a57c200f3dc3a");
-var kashiwadeData = ncmb.DataStore("kashiwade");
 var canvas = document.getElementById('maparea') ;
 
 var mapOptions = {
@@ -40,7 +38,7 @@ var marker2 = new google.maps.Marker({
 var marker3 = new google.maps.Marker({
   position: new google.maps.LatLng(35.6295764,139.794686),
   map: map,
-  title: "ビックサイト",
+  title: "ビッグサイト",
 });
 var marker4= new google.maps.Marker({
   position: new google.maps.LatLng(35.5571491,139.6949123),
@@ -48,15 +46,68 @@ var marker4= new google.maps.Marker({
   title: "ポケモンセンター",
 });
 var infowindow;
-var clapcounts={"ビックサイト":0,"新宿":0,"真鶴1":0,"ポケモンセンター":0,"真鶴2":0 };
+var clapcounts={"ビッグサイト":0,"新宿":0,"真鶴1":0,"ポケモンセンター":0,"真鶴2":0 };
+var ncmb = new NCMB("1be9dba7dec777026b5832322db9e5882f8e1cd5ed76fb7e45848657aa6c7ad3","af6b5030e091b942a843f099084821cd911e866622065d8f8c3a57c200f3dc3a");
+var kashiwadeData = ncmb.DataStore("kashiwade");
+
 function onclapdown()
 {
+	clapcounts[infowindow.markertitle]++;
+	var clapcount=clapcounts[infowindow.markertitle];
+	// kashiwadeData.equalTo("title", infowindow.markertitle)
+ //    	.fetchAll()
+ //    	.then(function(results){
+ //    		if(results[0] != null){
+ //    		 	results[0].setIncrement("num",1)
+ //        			.save()
+	// 				.then(function(results){
+	// 					results[0].update();
+	// 				})
+	// 				.then(function(results){
+ //    		 			clapcount=results[0].get("num");
+	// 				 })
+	// 				.catch(function(results,err){
+ //    		 			clapcount=results[0].get("num");
+ //    		 			clapcount++;
+	// 					console.log(err);
+	// 				});
+ //     		 		clapcount=results[0].get("num");
+ //    		 		clapcount++;
+ //   		}else{
+ //    		 	console.log("can't find data");
+ // 				clapcounts[infowindow.markertitle]++;
+ //   		 		clapcount=clapcounts[infowindow.markertitle];
+ //    		}
+ //    	})
+ //    	.catch(function(err){
+ //    		console.log(err.text);
+	// 		clapcounts[infowindow.markertitle]++;
+ //     		clapcount=clapcounts[infowindow.markertitle];
+ //   		});
+	kashiwadeData.equalTo("title", infowindow.markertitle)
+    	.fetchAll()
+    	.then(function(results){
+    		if(results[0] != null){
+    		 	clapcount=results[0].get("num");
+    		 	console.log("get success "+clapcount);
+    		 	clapcount++;
+    		}else{
+    		 	console.log("can't find data");
+ 				clapcounts[infowindow.markertitle]++;
+   		 		clapcount=clapcounts[infowindow.markertitle];
+    		}
+    	})
+    	.catch(function(err){
+    		console.log(err.text);
+			clapcounts[infowindow.markertitle]++;
+     		clapcount=clapcounts[infowindow.markertitle];
+   			});
 	var btnclap=document.getElementById('clapbtn');
 	btnclap.addEventListener("mouseleave",onclapup,false);
 	btnclap.style.backgroundImage='url(images/clap_2_c.png)';
-	clapcounts[infowindow.markertitle]++;
+    		 	console.log(clapcount);
 	var claptext=document.getElementById('claptext');
-	claptext.textContent=clapcounts[infowindow.markertitle]+'柏手';
+	claptext.textContent=clapcount+'柏手';
 	clap();
 }
 function onclapup()

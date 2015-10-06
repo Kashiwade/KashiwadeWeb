@@ -3,7 +3,7 @@ var fileSH={ "ir":"audiofiles/bktk-shinjuku-01_03may09_44116mono.wav","se":"","i
 var fileCP={ "ir":"audiofiles/carpool_IR-9_LR.wav","se":"audiofiles/carpool_SE-9.wav","image":"images/carpool.jpg" };
 var filePK={ "ir":"audiofiles/pokemon _IR-9_LR.wav","se":"audiofiles/pokemon_SE-9.wav","image":"images/pokemon.jpg" };
 var fileRF={ "ir":"audiofiles/rooftop_IR-9_LR.wav","se":"audiofiles/rooftop_SE-9.wav","image":"images/rooftop.jpeg" };
-var files={"ビックサイト":fileBS,"新宿":fileSH,"真鶴1":fileCP,"ポケモンセンター":filePK,"真鶴2":fileRF };
+var files={"ビッグサイト":fileBS,"新宿":fileSH,"真鶴1":fileCP,"ポケモンセンター":filePK,"真鶴2":fileRF };
          
 navigator.getMedia = navigator.getUserMedia ||
                      navigator.webkitGetUserMedia ||
