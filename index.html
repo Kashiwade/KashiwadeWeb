@@ -53,45 +53,22 @@ var kashiwadeData = ncmb.DataStore("kashiwade");
 function onclapdown()
 {
 	clapcounts[infowindow.markertitle]++;
-	var clapcount=clapcounts[infowindow.markertitle];
 	kashiwadeData.equalTo("title", infowindow.markertitle)
     	.fetchAll()
     	.then(function(results){
-    		if (results[0] != null) {
-    			console.log(results[0]);
-    		 	results[0].setIncrement("num",1)
-    		 	.save()
-				.then(function(results){
-					console.log("success");
-					results[0].update();
-    		 		clapcount=results[0].get("num");
- 					var claptext=document.getElementById('claptext');
-					claptext.textContent=clapcount+'柏手';
- 				 })
-				.catch(function(results,err){
-     		 		console.log("can't increment data");
-   		 			clapcount=results[0].get("num");
- 					var claptext=document.getElementById('claptext');
-					claptext.textContent=clapcount+'柏手';
-				});
+    		if (results[0]!=null) {
+				results[0].setIncrement("num",1).update();
    			} else {
     		 	console.log("can't find data");
- 				clapcounts[infowindow.markertitle]++;
-   		 		clapcount=clapcounts[infowindow.markertitle];
- 				var claptext=document.getElementById('claptext');
-				claptext.textContent=clapcount+'柏手';
      		}
     	})
     	.catch(function(err){
     		console.log(err);
-			clapcounts[infowindow.markertitle]++;
-     		clapcount=clapcounts[infowindow.markertitle];
- 			var claptext=document.getElementById('claptext');
-			claptext.textContent=clapcount+'柏手';
   		});
 	var btnclap=document.getElementById('clapbtn');
 	btnclap.addEventListener("mouseleave",onclapup,false);
 	btnclap.style.backgroundImage='url(images/clap_2_c.png)';
+ 	document.getElementById('claptext').textContent=clapcounts[infowindow.markertitle]+'柏手';
 	clap();
 }
 function onclapup()
@@ -100,11 +77,8 @@ function onclapup()
 	btnclap.removeEventListener("mouseleave",onclapup,false);
 	btnclap.style.backgroundImage='url(images/clap_1_c.png)';
 }
-function doMarkerClick(marker)
+function createMarkerInfo(marker,count)
 {
-	console.log(marker);
-	loadContents(marker.title);
-	if (infowindow) infowindow.close();
 	var htmltext="";
 	htmltext+=marker.title+"<br/>";
 	htmltext+='<img src="'+getImageURL(marker.title)+'"width="150" height="60"><br/>';
@@ -115,7 +89,7 @@ function doMarkerClick(marker)
 	htmltext+=' style="width:50px; height:50px; background-size:auto 100%; background-image:url(images/clap_1_c.png);"';
 	htmltext+=' onmousedown="onclapdown()" onmouseup="onclapup()"';
 	htmltext+='></div>';
-	htmltext+='<div id="claptext">'+clapcounts[marker.title]+'柏手</div>';
+	htmltext+='<div id="claptext">'+count+'柏手</div>';
   	infowindow = new google.maps.InfoWindow({
  		content: htmltext,
 		position: marker.position
@@ -125,6 +99,45 @@ function doMarkerClick(marker)
 	google.maps.event.addListener(infowindow,'closeclick', function() {
 		Stop();
 	});
+	clapcounts[marker.title]=count;
+}
+function checkcount()
+{
+	if (infowindow) {
+		kashiwadeData.equalTo("title", infowindow.markertitle)
+    	.fetchAll()
+    	.then(function(results){
+    		if (results[0]!=null) {
+    			var count=results[0].get("num");
+    			if (count>clapcounts[marker.title]) {
+    				clapcounts[marker.title]=count;
+ 					document.getElementById('claptext').textContent=count+'柏手';
+    			}
+    		}
+    	})
+    	.catch(function(err){
+  		});
+    }
+}
+var interval = setInterval('checkcount()',1000);
+function doMarkerClick(marker)
+{
+	console.log(marker);
+	loadContents(marker.title);
+	if (infowindow) infowindow.close();
+	kashiwadeData.equalTo("title", marker.title)
+    	.fetchAll()
+    	.then(function(results){
+    		if (results[0]!=null) {
+    			createMarkerInfo(marker,results[0].get("num"));
+   			} else {
+    		 	console.log("can't find data");
+    		 	createMarkerInfo(marker,clapcounts[marker.title]);
+     		}
+    	})
+    	.catch(function(err){
+    		createMarkerInfo(marker,clapcounts[marker.title]);
+  		});
 };
 google.maps.event.addListener(marker1, "mouseover", function() {
     doMarkerClick(marker1);
