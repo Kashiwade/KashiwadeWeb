@@ -109,8 +109,8 @@ function checkcount()
     	.then(function(results){
     		if (results[0]!=null) {
     			var count=results[0].get("num");
-    			if (count>clapcounts[marker.title]) {
-    				clapcounts[marker.title]=count;
+    			if (count>clapcounts[infowindow.markertitle]) {
+    				clapcounts[infowindow.markertitle]=count;
  					document.getElementById('claptext').textContent=count+'柏手';
     			}
     		}
