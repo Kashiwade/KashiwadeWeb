@@ -54,60 +54,44 @@ function onclapdown()
 {
 	clapcounts[infowindow.markertitle]++;
 	var clapcount=clapcounts[infowindow.markertitle];
-	// kashiwadeData.equalTo("title", infowindow.markertitle)
- //    	.fetchAll()
- //    	.then(function(results){
- //    		if(results[0] != null){
- //    		 	results[0].setIncrement("num",1)
- //        			.save()
-	// 				.then(function(results){
-	// 					results[0].update();
-	// 				})
-	// 				.then(function(results){
- //    		 			clapcount=results[0].get("num");
-	// 				 })
-	// 				.catch(function(results,err){
- //    		 			clapcount=results[0].get("num");
- //    		 			clapcount++;
-	// 					console.log(err);
-	// 				});
- //     		 		clapcount=results[0].get("num");
- //    		 		clapcount++;
- //   		}else{
- //    		 	console.log("can't find data");
- // 				clapcounts[infowindow.markertitle]++;
- //   		 		clapcount=clapcounts[infowindow.markertitle];
- //    		}
- //    	})
- //    	.catch(function(err){
- //    		console.log(err.text);
-	// 		clapcounts[infowindow.markertitle]++;
- //     		clapcount=clapcounts[infowindow.markertitle];
- //   		});
 	kashiwadeData.equalTo("title", infowindow.markertitle)
     	.fetchAll()
     	.then(function(results){
-    		if(results[0] != null){
-    		 	clapcount=results[0].get("num");
-    		 	console.log("get success "+clapcount);
-    		 	clapcount++;
-    		}else{
+    		if (results[0] != null) {
+    			console.log(results[0]);
+    		 	results[0].setIncrement("num",1)
+    		 	.save()
+				.then(function(results){
+					console.log("success");
+					results[0].update();
+    		 		clapcount=results[0].get("num");
+ 					var claptext=document.getElementById('claptext');
+					claptext.textContent=clapcount+'柏手';
+ 				 })
+				.catch(function(results,err){
+     		 		console.log("can't increment data");
+   		 			clapcount=results[0].get("num");
+ 					var claptext=document.getElementById('claptext');
+					claptext.textContent=clapcount+'柏手';
+				});
+   			} else {
     		 	console.log("can't find data");
  				clapcounts[infowindow.markertitle]++;
    		 		clapcount=clapcounts[infowindow.markertitle];
-    		}
+ 				var claptext=document.getElementById('claptext');
+				claptext.textContent=clapcount+'柏手';
+     		}
     	})
     	.catch(function(err){
-    		console.log(err.text);
+    		console.log(err);
 			clapcounts[infowindow.markertitle]++;
      		clapcount=clapcounts[infowindow.markertitle];
-   			});
+ 			var claptext=document.getElementById('claptext');
+			claptext.textContent=clapcount+'柏手';
+  		});
 	var btnclap=document.getElementById('clapbtn');
 	btnclap.addEventListener("mouseleave",onclapup,false);
 	btnclap.style.backgroundImage='url(images/clap_2_c.png)';
-    		 	console.log(clapcount);
-	var claptext=document.getElementById('claptext');
-	claptext.textContent=clapcount+'柏手';
 	clap();
 }
 function onclapup()
