@@ -47,24 +47,14 @@ var marker4= new google.maps.Marker({
 });
 var infowindow;
 var clapcounts={"ビッグサイト":0,"新宿":0,"真鶴1":0,"ポケモンセンター":0,"真鶴2":0 };
+var inccounts={"ビッグサイト":0,"新宿":0,"真鶴1":0,"ポケモンセンター":0,"真鶴2":0 };
 var ncmb = new NCMB("1be9dba7dec777026b5832322db9e5882f8e1cd5ed76fb7e45848657aa6c7ad3","af6b5030e091b942a843f099084821cd911e866622065d8f8c3a57c200f3dc3a");
 var kashiwadeData = ncmb.DataStore("kashiwade");
 
 function onclapdown()
 {
 	clapcounts[infowindow.markertitle]++;
-	kashiwadeData.equalTo("title", infowindow.markertitle)
-    	.fetchAll()
-    	.then(function(results){
-    		if (results[0]!=null) {
-				results[0].setIncrement("num",1).update();
-   			} else {
-    		 	console.log("can't find data");
-     		}
-    	})
-    	.catch(function(err){
-    		console.log(err);
-  		});
+	inccounts[infowindow.markertitle]++;
 	var btnclap=document.getElementById('clapbtn');
 	btnclap.addEventListener("mouseleave",onclapup,false);
 	btnclap.style.backgroundImage='url(images/clap_2_c.png)';
@@ -109,8 +99,14 @@ function checkcount()
     	.then(function(results){
     		if (results[0]!=null) {
     			var count=results[0].get("num");
-    			if (count>clapcounts[infowindow.markertitle]) {
-    				clapcounts[infowindow.markertitle]=count;
+    			var inccount=inccounts[infowindow.markertitle];
+    			if (count!=clapcounts[infowindow.markertitle]||inccount!=0) {
+    				if (inccount>0) {
+						results[0].setIncrement("num",inccount).update();
+    					count+=inccount;
+    					inccounts[infowindow.markertitle]=0;
+    				}
+   					clapcounts[infowindow.markertitle]=count;
  					document.getElementById('claptext').textContent=count+'柏手';
     			}
     		}
@@ -119,7 +115,7 @@ function checkcount()
   		});
     }
 }
-var interval = setInterval('checkcount()',500);
+var interval = setInterval('checkcount()',1000);
 function doMarkerClick(marker)
 {
 	console.log(marker);
