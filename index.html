@@ -5,7 +5,7 @@
 <title>Kashiwade Map</title>
 <meta name="viewport" content="width=device-width,user-scalable=0">
 <script src="https://maps.googleapis.com/maps/api/js?sensor=set_to_true_or_false"></script>
-<script type="text/javascript" src="ncmb.min.js" charset="utf-8"></script>
+<script src="https://cdn.firebase.com/js/client/2.1.1/firebase.js"></script>
 <script src="kashiwade.js"></script>
  </head>
 <body>
@@ -47,28 +47,34 @@ var marker4= new google.maps.Marker({
 });
 var infowindow;
 var clapcounts={"ビッグサイト":0,"新宿":0,"真鶴1":0,"ポケモンセンター":0,"真鶴2":0 };
-var ncmb = new NCMB("1be9dba7dec777026b5832322db9e5882f8e1cd5ed76fb7e45848657aa6c7ad3","af6b5030e091b942a843f099084821cd911e866622065d8f8c3a57c200f3dc3a");
-var kashiwadeData = ncmb.DataStore("kashiwade");
-
+var dataStore = new Firebase('https://kashiwade.firebaseio.com/');
+dataStore.on("value", function(snapshot) {
+	console.log("value");
+	var ref=snapshot.val();
+	var curmarkertitle="";
+	if (infowindow) curmarkertitle=infowindow.markertitle;	
+	for (key in clapcounts) {
+		var count=ref[key]["count"];
+		if (clapcounts[key]!=count) {
+			clapcounts[key]=count;
+			if (key==curmarkertitle) document.getElementById('claptext').textContent=count+'柏手';
+		}
+		console.log(key+":"+clapcounts[key]);
+	}
+  	console.log(clapcounts);
+}, function (err) {
+  	console.log(err.code);
+    console.log(clapcounts);	
+});
 function onclapdown()
 {
-	clapcounts[infowindow.markertitle]++;
-	kashiwadeData.equalTo("title", infowindow.markertitle)
-    	.fetchAll()
-    	.then(function(results){
-    		if (results[0]!=null) {
-				results[0].setIncrement("num",1).update();
-   			} else {
-    		 	console.log("can't find data");
-     		}
-    	})
-    	.catch(function(err){
-    		console.log(err);
-  		});
+	var count=++clapcounts[infowindow.markertitle];
 	var btnclap=document.getElementById('clapbtn');
 	btnclap.addEventListener("mouseleave",onclapup,false);
 	btnclap.style.backgroundImage='url(images/clap_2_c.png)';
- 	document.getElementById('claptext').textContent=clapcounts[infowindow.markertitle]+'柏手';
+ 	document.getElementById('claptext').textContent=count+'柏手';
+	var ref = dataStore.child(infowindow.markertitle);
+	ref.update({"count": count});
 	clap();
 }
 function onclapup()
@@ -101,43 +107,12 @@ function createMarkerInfo(marker,count)
 	});
 	clapcounts[marker.title]=count;
 }
-function checkcount()
-{
-	if (infowindow) {
-		kashiwadeData.equalTo("title", infowindow.markertitle)
-    	.fetchAll()
-    	.then(function(results){
-    		if (results[0]!=null) {
-    			var count=results[0].get("num");
-    			if (count>clapcounts[infowindow.markertitle]) {
-    				clapcounts[infowindow.markertitle]=count;
- 					document.getElementById('claptext').textContent=count+'柏手';
-    			}
-    		}
-    	})
-    	.catch(function(err){
-  		});
-    }
-}
-var interval = setInterval('checkcount()',500);
 function doMarkerClick(marker)
 {
 	console.log(marker);
 	loadContents(marker.title);
 	if (infowindow) infowindow.close();
-	kashiwadeData.equalTo("title", marker.title)
-    	.fetchAll()
-    	.then(function(results){
-    		if (results[0]!=null) {
-    			createMarkerInfo(marker,results[0].get("num"));
-   			} else {
-    		 	console.log("can't find data");
-    		 	createMarkerInfo(marker,clapcounts[marker.title]);
-     		}
-    	})
-    	.catch(function(err){
-    		createMarkerInfo(marker,clapcounts[marker.title]);
-  		});
+ 	createMarkerInfo(marker,clapcounts[marker.title]);
 };
 google.maps.event.addListener(marker1, "mouseover", function() {
     doMarkerClick(marker1);
