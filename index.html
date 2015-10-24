@@ -22,37 +22,51 @@ var mapOptions = {
 	disableDefaultUI: true,
 	mapTypeId: google.maps.MapTypeId.ROADMAP
 };
+var latlng={"ビッグサイト":[35.6295764,139.794686],
+				"新宿":[35.7015253,139.7092071],
+				"真鶴1":[35.1540774,139.1351988],
+				"ポケモンセンター":[35.5571491,139.6949123],
+				"真鶴2":[35.1598865,139.1359708] }
 
 var map = new google.maps.Map( canvas , mapOptions ) ;
 
-var marker5 = new google.maps.Marker({
-  position: new google.maps.LatLng(35.1540774,139.1351988),
-  map: map,
-  title: "真鶴1",
-});
 var marker1 = new google.maps.Marker({
-  position: new google.maps.LatLng(35.1598865,139.1359708),
+  position: new google.maps.LatLng(latlng["真鶴2"][0],latlng["真鶴2"][1]),
   map: map,
   title: "真鶴2",
 });
 var marker2 = new google.maps.Marker({
-  position: new google.maps.LatLng(35.7015253,139.7092071),
+  position: new google.maps.LatLng(latlng["新宿"][0],latlng["新宿"][1]),
   map: map,
   title: "新宿",
 });
 var marker3 = new google.maps.Marker({
-  position: new google.maps.LatLng(35.6295764,139.794686),
+  position: new google.maps.LatLng(latlng["ビッグサイト"][0],latlng["ビッグサイト"][1]),
   map: map,
   title: "ビッグサイト",
 });
 var marker4= new google.maps.Marker({
-  position: new google.maps.LatLng(35.5571491,139.6949123),
+  position: new google.maps.LatLng(latlng["ポケモンセンター"][0],latlng["ポケモンセンター"][1]),
   map: map,
   title: "ポケモンセンター",
 });
+var marker5 = new google.maps.Marker({
+  position: new google.maps.LatLng(latlng["真鶴1"][0],latlng["真鶴1"][1]),
+  map: map,
+  title: "真鶴1",
+});
+var clapmarkers={"ビッグサイト":0,"新宿":0,"真鶴1":0,"ポケモンセンター":0,"真鶴2":0 };
+for (key in clapmarkers) {
+	clapmarkers[key]=new google.maps.Marker({
+  		position: new google.maps.LatLng(latlng[key][0],latlng[key][1]),
+  		title: key,
+  		icon: "images/clap_pin.png",
+	});
+}
 var infowindow;
 var clapcounts={"ビッグサイト":0,"新宿":0,"真鶴1":0,"ポケモンセンター":0,"真鶴2":0 };
 var dataStore = new Firebase('https://kashiwade.firebaseio.com/');
+var is1st=true;
 dataStore.on("value", function(snapshot) {
 	console.log("value");
 	var ref=snapshot.val();
@@ -63,9 +77,16 @@ dataStore.on("value", function(snapshot) {
 		if (clapcounts[key]!=count) {
 			clapcounts[key]=count;
 			if (key==curmarkertitle) document.getElementById('claptext').textContent=count+'柏手';
+			if (!is1st) {
+				clapmarkers[key].setMap(map);
+				setTimeout(function(clapmarker){
+					clapmarker.setMap(null);
+				},1500,clapmarkers[key]);
+			}
 		}
 		console.log(key+":"+clapcounts[key]);
 	}
+	is1st=false;
   	console.log(clapcounts);
 }, function (err) {
   	console.log(err.code);

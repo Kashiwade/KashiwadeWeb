@@ -29,7 +29,7 @@ if (AudioContext) {
 var player = null;
 var ismicconnect = 0;
 var convolver = audioctx.createConvolver();
-var miclevelmax=0.5;
+var miclevelmax=0.8;
 var revlevelmax=1.0;
 var selevelmax=1.0;
 var miclevel = audioctx.createGain();
