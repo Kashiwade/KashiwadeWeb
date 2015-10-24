@@ -1,9 +1,9 @@
 var fileBS={ "ir":"audiofiles/TokyoBigSite_IR-9_LR.wav","se":"","image":"images/tokyoBigSiteBasement.jpg" };
-var fileSH={ "ir":"audiofiles/bktk-shinjuku-01_03may09_44116mono.wav","se":"","image":"" };
+var fileSH={ "ir":"audiofiles/bktk-shinjuku-01_03may09_44116stereo.wav","se":"","image":"" };
 var fileCP={ "ir":"audiofiles/carpool_IR-9_LR.wav","se":"audiofiles/carpool_SE-9.wav","image":"images/carpool.jpg" };
 var filePK={ "ir":"audiofiles/pokemon _IR-9_LR.wav","se":"audiofiles/pokemon_SE-9.wav","image":"images/pokemon.jpg" };
 var fileRF={ "ir":"audiofiles/rooftop_IR-9_LR.wav","se":"audiofiles/rooftop_SE-9.wav","image":"images/rooftop.jpeg" };
-var files={"ビッグサイト":fileBS,"新宿":fileSH,"真鶴1":fileCP,"ポケモンセンター":filePK,"真鶴2":fileRF };
+var files={"ビッグサイト":fileBS,"新宿":fileSH,"真鶴1":fileRF,"ポケモンセンター":filePK,"真鶴2":fileCP };
          
 navigator.getMedia = navigator.getUserMedia ||
                      navigator.webkitGetUserMedia ||
@@ -27,17 +27,22 @@ if (AudioContext) {
 }
  
 var player = null;
+var ismicconnect = 0;
 var convolver = audioctx.createConvolver();
+var miclevelmax=0.5;
+var revlevelmax=1.0;
+var selevelmax=1.0;
+var miclevel = audioctx.createGain();
 var revlevel = audioctx.createGain();
 var selevel = audioctx.createGain();
 var dummy = audioctx.createGain();
-revlevel.gain.value=0.5;
-selevel.gain.value=0.5;
+miclevel.gain.value=miclevelmax*0.1;
+revlevel.gain.value=revlevelmax*0.5;
+selevel.gain.value=selevelmax*0.5;
 convolver.connect(revlevel);
 selevel.connect(audioctx.destination);
 revlevel.connect(audioctx.destination);
 var loadfiles = [
-    "",
     "",
     "",
 ];
@@ -90,13 +95,17 @@ function loadContents(key) {
 function getImageURL(key) {
     return files[key]["image"];
 }
+function setMicLevel() {
+    var level=document.getElementById("miclevel").value;
+    miclevel.gain.value=parseInt(level)/100*miclevelmax;
+}
 function setRevLevel() {
     var level=document.getElementById("revlevel").value;
-    revlevel.gain.value=parseInt(level)*0.01;
+    revlevel.gain.value=parseInt(level)/100*revlevelmax;
 }
 function setSELevel() {
     var level=document.getElementById("selevel").value;
-    selevel.gain.value=parseInt(level)*0.01;
+    selevel.gain.value=parseInt(level)/100*selevelmax;
 }
 function clap() {
     convolver.buffer = buffers[0];
@@ -105,17 +114,36 @@ function clap() {
     source.loop = false;
     source.connect(audioctx.destination);
     source.connect(convolver);
-    source.start(0);
+    if (buffers[0]) source.start(0);
+}
+function connectMic()
+{
+    if (mic) {
+        mic.connect(miclevel);
+        miclevel.connect(convolver);
+        miclevel.connect(audioctx.destination);
+        ismicconnect=1;
+    }
+}
+function disconnectMic()
+{
+    if (mic) {
+        mic.disconnect();
+        ismicconnect=0;
+    }
 }
 function Play() {
-    if(player == null) {
+    if (player == null) {
         convolver.buffer = buffers[0];
-        //revlevel.connect(audioctx.destination);
-        if (mic) {
-            mic.connect(convolver);
-            mic.connect(audioctx.destination);
+        if (buffers[1]==null) {
+            if (ismicconnect) {
+                disconnectMic();
+            } else {
+                connectMic();
+            }
+            return;
         }
-        if (buffers[1]==null) return;
+        connectMic();
         player = audioctx.createBufferSource();
         player.buffer = buffers[1];
         player.loop = true;
@@ -126,8 +154,7 @@ function Play() {
     }
 }
 function Stop() {
-    //revlevel.disconnect();
-    if (mic) mic.disconnect();
+    disconnectMic();
     if (player==null) return;
     player.stop(0);
     player = null;

@@ -25,10 +25,15 @@ var mapOptions = {
 
 var map = new google.maps.Map( canvas , mapOptions ) ;
 
-var marker1 = new google.maps.Marker({
-  position: new google.maps.LatLng(35.1598865,139.1359808),
+var marker5 = new google.maps.Marker({
+  position: new google.maps.LatLng(35.1540774,139.1351988),
   map: map,
   title: "真鶴1",
+});
+var marker1 = new google.maps.Marker({
+  position: new google.maps.LatLng(35.1598865,139.1359708),
+  map: map,
+  title: "真鶴2",
 });
 var marker2 = new google.maps.Marker({
   position: new google.maps.LatLng(35.7015253,139.7092071),
@@ -89,6 +94,7 @@ function createMarkerInfo(marker,count)
 	htmltext+=marker.title+"<br/>";
 	htmltext+='<img src="'+getImageURL(marker.title)+'"width="150" height="60"><br/>';
 	htmltext+='<button onclick="Play()">Play</button><br/>';
+	htmltext+='MicLevel : <input type="range" id="miclevel" min="0" max="100" value="10" onchange="setMicLevel()"/><br/>';
 	htmltext+='ReverbLevel : <input type="range" id="revlevel" min="0" max="100" value="50" onchange="setRevLevel()"/><br/>';
 	htmltext+='SELevel :     <input type="range" id="selevel" min="0" max="100" value="50" onchange="setSELevel()"/><br/>';
 	htmltext+='<div id="clapbtn"'
@@ -125,6 +131,9 @@ google.maps.event.addListener(marker3, "mouseover", function() {
 });
 google.maps.event.addListener(marker4, "mouseover", function() {
     doMarkerClick(marker4);
+});
+google.maps.event.addListener(marker5, "mouseover", function() {
+    doMarkerClick(marker5);
 });
 </script>
 <style type="text/css">
