@@ -94,6 +94,7 @@ function createMarkerInfo(marker,count)
 	htmltext+=marker.title+"<br/>";
 	htmltext+='<img src="'+getImageURL(marker.title)+'"width="150" height="60"><br/>';
 	htmltext+='<button onclick="Play()">Play</button><br/>';
+	htmltext+='MicLevel : <input type="range" id="miclevel" min="0" max="100" value="10" onchange="setMicLevel()"/><br/>';
 	htmltext+='ReverbLevel : <input type="range" id="revlevel" min="0" max="100" value="50" onchange="setRevLevel()"/><br/>';
 	htmltext+='SELevel :     <input type="range" id="selevel" min="0" max="100" value="50" onchange="setSELevel()"/><br/>';
 	htmltext+='<div id="clapbtn"'
